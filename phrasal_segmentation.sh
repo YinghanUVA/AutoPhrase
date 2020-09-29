@@ -5,14 +5,14 @@ if [ -d "default_models" ]; then
 else
     MODELS_DIR=${MODELS_DIR:- models}
 fi
-MODEL=${MODEL:- ${MODELS_DIR}/DBLP}
+MODEL=${MODEL:- ${MODELS_DIR}/kp20k}
 if [ -d "default_data" ]; then
     DATA_DIR=${DATA_DIR:- default_data}
 else
     DATA_DIR=${DATA_DIR:- data}
 fi
-TEXT_TO_SEG=${TEXT_TO_SEG:- ${DATA_DIR}/EN/DBLP.5K.txt}
-HIGHLIGHT_MULTI=${HIGHLIGHT_MULTI:- 0.5}
+TEXT_TO_SEG=./data/EN/kp20k.test.100aug.txt
+HIGHLIGHT_MULTI=${HIGHLIGHT_MULTI:- 0.3}
 HIGHLIGHT_SINGLE=${HIGHLIGHT_SINGLE:- 0.8}
 
 SEGMENTATION_MODEL=${MODEL}/segmentation.model
@@ -54,10 +54,10 @@ echo -ne "Detected Language: $LANGUAGE\033[0K\n"
 echo ${green}===Part-Of-Speech Tagging===${reset}
 
 if [ ! $LANGUAGE == "JA" ] && [ ! $LANGUAGE == "CN" ]  && [ ! $LANGUAGE == "OTHER" ]  && [ $ENABLE_POS_TAGGING -eq 1 ]; then
-	RAW=tmp/raw_tokenized_text_to_seg.txt # TOKENIZED_TEXT_TO_SEG is the suffix name after "raw_"
-	export THREAD LANGUAGE RAW
-	bash ./tools/treetagger/pos_tag.sh
-	mv tmp/pos_tags.txt tmp/pos_tags_tokenized_text_to_seg.txt
+    RAW=tmp/raw_tokenized_text_to_seg.txt # TOKENIZED_TEXT_TO_SEG is the suffix name after "raw_"
+    export THREAD LANGUAGE RAW
+    bash ./tools/treetagger/pos_tag.sh
+    mv tmp/pos_tags.txt tmp/pos_tags_tokenized_text_to_seg.txt
 fi
 
 POS_TAGS=tmp/pos_tags_tokenized_text_to_seg.txt
@@ -67,23 +67,23 @@ POS_TAGS=tmp/pos_tags_tokenized_text_to_seg.txt
 echo ${green}===Phrasal Segmentation===${reset}
 
 if [ $ENABLE_POS_TAGGING -eq 1 ]; then
-	time ./bin/segphrase_segment \
+    time ./bin/segphrase_segment \
         --pos_tag \
         --thread $THREAD \
         --model $SEGMENTATION_MODEL \
-		--highlight-multi $HIGHLIGHT_MULTI \
-		--highlight-single $HIGHLIGHT_SINGLE
+        --highlight-multi $HIGHLIGHT_MULTI \
+        --highlight-single $HIGHLIGHT_SINGLE
 else
-	time ./bin/segphrase_segment \
+    time ./bin/segphrase_segment \
         --thread $THREAD \
         --model $SEGMENTATION_MODEL \
-		--highlight-multi $HIGHLIGHT_MULTI \
-		--highlight-single $HIGHLIGHT_SINGLE
+        --highlight-multi $HIGHLIGHT_MULTI \
+        --highlight-single $HIGHLIGHT_SINGLE
 fi
 
 ### END Segphrasing ###
 
 echo ${green}===Generating Output===${reset}
-time java $TOKENIZER -m segmentation -i $TEXT_TO_SEG -segmented tmp/tokenized_segmented_sentences.txt -o ${MODEL}/segmentation.txt -tokenized_raw tmp/raw_tokenized_text_to_seg.txt -tokenized_id tmp/tokenized_text_to_seg.txt -c N
+time java $TOKENIZER -m segmentation -i $TEXT_TO_SEG -segmented tmp/tokenized_segmented_sentences.txt -o ${MODEL}/segmentation.kp20k.100aug.txt -tokenized_raw tmp/raw_tokenized_text_to_seg.txt -tokenized_id tmp/tokenized_text_to_seg.txt -c N
 
 ### END Generating Output for Checking Quality ###

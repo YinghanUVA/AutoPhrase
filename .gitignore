@@ -1,8 +1,14 @@
-data/corpus.txt
-models/MyModel/
+data/EN/wikiquality.txt
+models/
 Python/
 results/
 tmp/
+bin/*
 
 *.orig
 *.pyc
+*.ipynb
+*.json
+*.txt
+*._.DS_Store
+*.DS_Store
