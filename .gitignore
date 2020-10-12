@@ -7,7 +7,6 @@ bin/*
 
 *.orig
 *.pyc
-*.ipynb
 *.json
 *.txt
 *._.DS_Store
